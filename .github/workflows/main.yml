@@ -1,0 +1,40 @@
+name: Generate Breek Animation
+
+on:
+  # run automatically every 24 hours
+  schedule:
+    - cron: "0 */24 * * *"
+
+  # allows to manually run the job at any time
+  workflow_dispatch:
+
+  # run on every push on the main branch
+  push:
+    branches:
+      - main
+
+jobs:
+  generate:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Generate Breek Animation
+        uses: cherninlab/breek@v1.0.0
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          svg_out_path: dist/github-contribution-grid-breek.svg
+          svg_dark_out_path: dist/github-contribution-grid-breek-dark.svg
+
+      - name: Push Breek animations to the output branch
+        uses: crazy-max/ghaction-github-pages@v3.1.0
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
